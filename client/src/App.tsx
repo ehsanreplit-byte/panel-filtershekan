@@ -38,7 +38,7 @@ function Login({ onLogin }: { onLogin: (token: string, username: string) => void
 function App() {
   const [token, setToken] = useState(() => sessionStorage.getItem('fs-token') || ''); const [admin, setAdmin] = useState(() => sessionStorage.getItem('fs-user') || 'ehsan');
   const [section, setSection] = useState('dashboard'); const [users, setUsers] = useState<User[]>([]); const [search, setSearch] = useState(''); const [mobileMenu, setMobileMenu] = useState(false); const [messages, setMessages] = useState(initialMessages); const [draft, setDraft] = useState(''); const [toast, setToast] = useState(''); const [loading, setLoading] = useState(false);
-  useEffect(() => { if (!token) return; setLoading(true); api<User[]>('/api/users', token).then(setUsers).catch(() => { sessionStorage.clear(); setToken(''); }).finally(() => setLoading(false)); }, [token]);
+  useEffect(() => { if (!token) return; setLoading(true); api<User[]>('/api/users', token).then(setUsers).catch(() => { sessionStorage.clear(); setToken(''); }).finally(() => setLoading(false)); api<Message[]>('/api/chat', token).then(rows => { if (rows.length) setMessages(rows.map(row => ({ ...row, time: new Date(row.time).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) }))); }).catch(() => {}); }, [token]);
   const filteredUsers = useMemo(() => users.filter(u => `${u.name} ${u.username} ${u.plan}`.includes(search)), [users, search]);
   const login = (newToken: string, username: string) => { sessionStorage.setItem('fs-token', newToken); sessionStorage.setItem('fs-user', username); setAdmin(username); setToken(newToken); };
   const logout = () => { sessionStorage.clear(); setToken(''); setSection('dashboard'); };
